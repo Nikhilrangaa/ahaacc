@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fagan Nomogram CAD Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Fagan Nomogram CAD Calculator</h2>
+        <label for="preProbability">Pre-Test Probability (%)</label>
+        <input type="number" id="preProbability" placeholder="Enter pre-test probability">
+
+        <label for="lrPositive">Likelihood Ratio Positive</label>
+        <input type="number" id="lrPositive" placeholder="Enter likelihood ratio positive">
+
+        <label for="lrNegative">Likelihood Ratio Negative</label>
+        <input type="number" id="lrNegative" placeholder="Enter likelihood ratio negative">
+
+        <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
+
+        <h3 id="result"></h3>
+    </div>
+
+    <script>
+        function calculatePostProbability() {
+            const preProbability = parseFloat(document.getElementById('preProbability').value);
+            const lrPositive = parseFloat(document.getElementById('lrPositive').value);
+            const lrNegative = parseFloat(document.getElementById('lrNegative').value);
+
+            if (isNaN(preProbability) || isNaN(lrPositive) || isNaN(lrNegative)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            // Convert pre-test probability to odds
+            const preOdds = preProbability / (100 - preProbability);
+
+            // Calculate post-test odds using the likelihood ratios
+            const postOddsPositive = preOdds * lrPositive;
+            const postOddsNegative = preOdds * lrNegative;
+
+            // Convert post-test odds back to probabilities
+            const postProbabilityPositive = postOddsPositive / (1 + postOddsPositive) * 100;
+            const postProbabilityNegative = postOddsNegative / (1 + postOddsNegative) * 100;
+
+            document.getElementById('result').innerHTML = `
+                Post-Test Probability (Positive): ${postProbabilityPositive.toFixed(2)}%<br>
+                Post-Test Probability (Negative): ${postProbabilityNegative.toFixed(2)}%
+            `;
+        }
+    </script>
+</body>
+</html>
+
