@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fagan Nomogram CAD Calculator</title>
+    <title>CAD Probability Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
             max-width: 500px;
             margin: 0 auto;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -33,49 +33,144 @@
 </head>
 <body>
     <div class="container">
-        <h2>Fagan Nomogram CAD Calculator</h2>
-        <label for="preProbability">Pre-Test Probability (%)</label>
-        <input type="number" id="preProbability" placeholder="Enter pre-test probability">
+        <h2>CAD Probability Calculator</h2>
+        <h3>Step 1: Pre-Test Probability</h3>
+        <label for="age">Age</label>
+        <select id="age">
+            <option value="30-39">30-39</option>
+            <option value="40-49">40-49</option>
+            <option value="50-59">50-59</option>
+            <option value="60-69">60-69</option>
+            <option value="70-79">70-79</option>
+            <option value=">80">>80</option>
+        </select>
 
-        <label for="lrPositive">Likelihood Ratio Positive</label>
-        <input type="number" id="lrPositive" placeholder="Enter likelihood ratio positive">
+        <label for="gender">Birth Gender</label>
+        <select id="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
 
-        <label for="lrNegative">Likelihood Ratio Negative</label>
-        <input type="number" id="lrNegative" placeholder="Enter likelihood ratio negative">
+        <label for="symptoms">Symptoms</label>
+        <select id="symptoms">
+            <option value="typical">Typical Angina</option>
+            <option value="atypical">Atypical Angina</option>
+            <option value="non_anginal">Non-anginal Pain</option>
+        </select>
+
+        <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
+
+        <h3>Or Enter Your Own Pre-Test Probability</h3>
+        <label for="customPreProbability">Pre-Test Probability (%)</label>
+        <input type="number" id="customPreProbability" placeholder="Enter Pre-Test Probability">
+
+        <h3>Step 2: Post-Test Probability</h3>
+        <label for="cadScore">CAD Test Score</label>
+        <input type="number" id="cadScore" placeholder="Enter CAD test score">
 
         <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
 
         <h3 id="result"></h3>
+        <h4 id="guidance"></h4>
     </div>
 
     <script>
-        function calculatePostProbability() {
-            const preProbability = parseFloat(document.getElementById('preProbability').value);
-            const lrPositive = parseFloat(document.getElementById('lrPositive').value);
-            const lrNegative = parseFloat(document.getElementById('lrNegative').value);
+        const preTestProbabilityTable = {
+            'male': {
+                '30-39': {'typical': 59, 'atypical': 29, 'non_anginal': 18},
+                '40-49': {'typical': 69, 'atypical': 38, 'non_anginal': 25},
+                '50-59': {'typical': 77, 'atypical': 49, 'non_anginal': 34},
+                '60-69': {'typical': 84, 'atypical': 59, 'non_anginal': 44},
+                '70-79': {'typical': 89, 'atypical': 69, 'non_anginal': 54},
+                '>80': {'typical': 93, 'atypical': 78, 'non_anginal': 65}
+            },
+            'female': {
+                '30-39': {'typical': 28, 'atypical': 10, 'non_anginal': 5},
+                '40-49': {'typical': 37, 'atypical': 14, 'non_anginal': 8},
+                '50-59': {'typical': 47, 'atypical': 20, 'non_anginal': 12},
+                '60-69': {'typical': 58, 'atypical': 28, 'non_anginal': 17},
+                '70-79': {'typical': 68, 'atypical': 37, 'non_anginal': 24},
+                '>80': {'typical': 76, 'atypical': 47, 'non_anginal': 32}
+            }
+        };
 
-            if (isNaN(preProbability) || isNaN(lrPositive) || isNaN(lrNegative)) {
-                alert('Please enter valid numbers');
+        function calculatePreProbability() {
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const symptoms = document.getElementById('symptoms').value;
+
+            const preProbability = preTestProbabilityTable[gender][age][symptoms];
+
+            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability.toFixed(2)}%`;
+        }
+
+        const likelihoodRatios = {
+            'negative': [
+                {range: [-Infinity, -0.12], lr: 0.129},
+                {range: [-0.11, -0.07], lr: 0.220},
+                {range: [-0.06, 0], lr: 0.340}
+            ],
+            'positive': [
+                {range: [0.00, 0.10], lr: 1.446},
+                {range: [0.11, 0.20], lr: 1.913},
+                {range: [0.21, Infinity], lr: 2.888}
+            ]
+        };
+
+        function calculatePostProbability() {
+            let preProbability = parseFloat(document.getElementById('customPreProbability').value);
+            if (isNaN(preProbability)) {
+                const preProbabilityText = document.getElementById('result').innerText;
+                preProbability = parseFloat(preProbabilityText.split(': ')[1].replace('%', ''));
+            }
+            const cadScore = parseFloat(document.getElementById('cadScore').value);
+
+            if (isNaN(preProbability) || isNaN(cadScore)) {
+                alert('Please calculate pre-test probability or enter a valid pre-test probability and CAD test score');
                 return;
             }
 
-            // Convert pre-test probability to odds
+            let lr;
+            if (cadScore < 0) {
+                for (let i = 0; i < likelihoodRatios['negative'].length; i++) {
+                    if (cadScore >= likelihoodRatios['negative'][i].range[0] && cadScore <= likelihoodRatios['negative'][i].range[1]) {
+                        lr = likelihoodRatios['negative'][i].lr;
+                        break;
+                    }
+                }
+            } else {
+                for (let i = 0; i < likelihoodRatios['positive'].length; i++) {
+                    if (cadScore >= likelihoodRatios['positive'][i].range[0] && cadScore <= likelihoodRatios['positive'][i].range[1]) {
+                        lr = likelihoodRatios['positive'][i].lr;
+                        break;
+                    }
+                }
+            }
+
             const preOdds = preProbability / (100 - preProbability);
+            const postOdds = preOdds * lr;
+            const postProbability = postOdds / (1 + postOdds) * 100;
 
-            // Calculate post-test odds using the likelihood ratios
-            const postOddsPositive = preOdds * lrPositive;
-            const postOddsNegative = preOdds * lrNegative;
+            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability.toFixed(2)}%<br>Post-Test Probability: ${postProbability.toFixed(2)}%`;
 
-            // Convert post-test odds back to probabilities
-            const postProbabilityPositive = postOddsPositive / (1 + postOddsPositive) * 100;
-            const postProbabilityNegative = postOddsNegative / (1 + postOddsNegative) * 100;
+            provideGuidance(postProbability);
+        }
 
-            document.getElementById('result').innerHTML = `
-                Post-Test Probability (Positive): ${postProbabilityPositive.toFixed(2)}%<br>
-                Post-Test Probability (Negative): ${postProbabilityNegative.toFixed(2)}%
-            `;
+        function provideGuidance(postProbability) {
+            let guidanceText = "";
+
+            if (postProbability > 85) {
+                guidanceText = "High probability of CAD. Invasive coronary angiography is recommended.";
+            } else if (postProbability < 15) {
+                guidanceText = "Low probability of CAD. Further testing is usually not recommended.";
+            } else {
+                guidanceText = "Intermediate probability of CAD. Additional non-invasive testing such as stress echocardiography, stress SPECT, stress PET, stress CMR, or CCTA is recommended.";
+            }
+
+            document.getElementById('guidance').innerHTML = guidanceText;
         }
     </script>
 </body>
 </html>
+
 
