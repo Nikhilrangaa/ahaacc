@@ -29,7 +29,7 @@
         button:hover {
             background-color: #45a049;
         }
-        #result, #guidance {
+        #result, #postResult, #guidance {
             margin-top: 20px;
         }
     </style>
@@ -61,6 +61,7 @@
         </select>
 
         <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
+        <span id="result" style="font-weight: bold;"></span>
 
         <h3>Or Enter Your Own Pre-Test Probability</h3>
         <label for="customPreProbability">Pre-Test Probability (%)</label>
@@ -71,8 +72,8 @@
         <input type="number" id="cadScore" placeholder="Enter CAD test score">
 
         <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
+        <span id="postResult" style="font-weight: bold;"></span>
 
-        <div id="result"></div>
         <div id="guidance"></div>
     </div>
 
@@ -153,7 +154,7 @@
             const postOdds = preOdds * lr;
             const postProbability = postOdds / (1 + postOdds) * 100;
 
-            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability}%<br>Post-Test Probability: ${postProbability.toFixed(2)}%`;
+            document.getElementById('postResult').innerHTML = `Post-Test Probability: ${postProbability.toFixed(2)}%`;
 
             provideGuidance(postProbability);
         }
@@ -174,3 +175,4 @@
     </script>
 </body>
 </html>
+
