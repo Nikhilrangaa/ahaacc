@@ -29,8 +29,14 @@
         button:hover {
             background-color: #45a049;
         }
-        #result, #postResult, #guidance {
+        #result, #postResult {
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        #guidance {
             margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -61,7 +67,7 @@
         </select>
 
         <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
-        <span id="result" style="font-weight: bold;"></span>
+        <span id="result"></span>
 
         <h3>Or Enter Your Own Pre-Test Probability</h3>
         <label for="customPreProbability">Pre-Test Probability (%)</label>
@@ -72,7 +78,7 @@
         <input type="number" id="cadScore" placeholder="Enter CAD test score">
 
         <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
-        <span id="postResult" style="font-weight: bold;"></span>
+        <span id="postResult"></span>
 
         <div id="guidance"></div>
     </div>
