@@ -29,6 +29,9 @@
         button:hover {
             background-color: #45a049;
         }
+        #result, #guidance {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -53,9 +56,8 @@
 
         <label for="symptoms">Symptoms</label>
         <select id="symptoms">
-            <option value="typical">Typical Angina</option>
-            <option value="atypical">Atypical Angina</option>
-            <option value="non_anginal">Non-anginal Pain</option>
+            <option value="Chest Pain">Chest Pain</option>
+            <option value="Dyspnea">Dyspnea</option>
         </select>
 
         <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
@@ -70,27 +72,27 @@
 
         <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
 
-        <h3 id="result"></h3>
-        <h4 id="guidance"></h4>
+        <div id="result"></div>
+        <div id="guidance"></div>
     </div>
 
     <script>
         const preTestProbabilityTable = {
             'male': {
-                '30-39': {'typical': 59, 'atypical': 29, 'non_anginal': 18},
-                '40-49': {'typical': 69, 'atypical': 38, 'non_anginal': 25},
-                '50-59': {'typical': 77, 'atypical': 49, 'non_anginal': 34},
-                '60-69': {'typical': 84, 'atypical': 59, 'non_anginal': 44},
-                '70-79': {'typical': 89, 'atypical': 69, 'non_anginal': 54},
-                '>80': {'typical': 93, 'atypical': 78, 'non_anginal': 65}
+                '30-39': {'Chest Pain': 4, 'Dyspnea': 0},
+                '40-49': {'Chest Pain': 22, 'Dyspnea': 12},
+                '50-59': {'Chest Pain': 32, 'Dyspnea': 20},
+                '60-69': {'Chest Pain': 44, 'Dyspnea': 27},
+                '70-79': {'Chest Pain': 52, 'Dyspnea': 32},
+                '>80': {'Chest Pain': 52, 'Dyspnea': 32}
             },
             'female': {
-                '30-39': {'typical': 28, 'atypical': 10, 'non_anginal': 5},
-                '40-49': {'typical': 37, 'atypical': 14, 'non_anginal': 8},
-                '50-59': {'typical': 47, 'atypical': 20, 'non_anginal': 12},
-                '60-69': {'typical': 58, 'atypical': 28, 'non_anginal': 17},
-                '70-79': {'typical': 68, 'atypical': 37, 'non_anginal': 24},
-                '>80': {'typical': 76, 'atypical': 47, 'non_anginal': 32}
+                '30-39': {'Chest Pain': 5, 'Dyspnea': 3},
+                '40-49': {'Chest Pain': 10, 'Dyspnea': 3},
+                '50-59': {'Chest Pain': 13, 'Dyspnea': 9},
+                '60-69': {'Chest Pain': 16, 'Dyspnea': 14},
+                '70-79': {'Chest Pain': 27, 'Dyspnea': 12},
+                '>80': {'Chest Pain': 27, 'Dyspnea': 12}
             }
         };
 
@@ -101,7 +103,7 @@
 
             const preProbability = preTestProbabilityTable[gender][age][symptoms];
 
-            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability.toFixed(2)}%`;
+            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability}%`;
         }
 
         const likelihoodRatios = {
@@ -151,7 +153,7 @@
             const postOdds = preOdds * lr;
             const postProbability = postOdds / (1 + postOdds) * 100;
 
-            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability.toFixed(2)}%<br>Post-Test Probability: ${postProbability.toFixed(2)}%`;
+            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability}%<br>Post-Test Probability: ${postProbability.toFixed(2)}%`;
 
             provideGuidance(postProbability);
         }
@@ -167,9 +169,8 @@
                 guidanceText = "Intermediate probability of CAD. Additional non-invasive testing such as stress echocardiography, stress SPECT, stress PET, stress CMR, or CCTA is recommended.";
             }
 
-            document.getElementById('guidance').innerHTML = guidanceText;
+            document.getElementById('guidance').innerHTML = `Guidance: ${guidanceText}`;
         }
     </script>
 </body>
 </html>
-
