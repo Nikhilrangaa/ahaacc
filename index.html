@@ -3,47 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD Probability Calculator</title>
+    <title>Converting Corvista Score to Post-Test Probability Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            background-color: #004b91;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
         }
         .container {
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #004b91;
+            margin-top: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
         }
         input, select {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px 0;
             box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #004b91;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #003a70;
         }
-        #result, #postResult {
-            font-weight: bold;
-            display: inline-block;
-            margin-left: 10px;
-        }
-        #guidance {
+        .result, .guidance {
             margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3fe;
+            border-left: 4px solid #004b91;
+            display: inline-block;
+            width: calc(100% - 24px);
+        }
+        .result span, .guidance span {
+            font-weight: bold;
+        }
+        .bold-text {
             font-weight: bold;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        Converting Corvista Score to Post-Test Probability Calculator
+    </div>
     <div class="container">
-        <h2>CAD Probability Calculator</h2>
-        <h3>Step 1: Pre-Test Probability</h3>
+        <h2>Step 1: Pre-Test Probability</h2>
         <label for="age">Age</label>
         <select id="age">
             <option value="30-39">30-39</option>
@@ -67,20 +102,20 @@
         </select>
 
         <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
-        <span id="result"></span>
+        <div id="result" class="result"><span id="resultValue" class="bold-text"></span></div>
 
-        <h3>Or Enter Your Own Pre-Test Probability</h3>
+        <h2>Or Enter Your Own Pre-Test Probability</h2>
         <label for="customPreProbability">Pre-Test Probability (%)</label>
         <input type="number" id="customPreProbability" placeholder="Enter Pre-Test Probability">
 
-        <h3>Step 2: Post-Test Probability</h3>
+        <h2>Step 2: Post-Test Probability</h2>
         <label for="cadScore">CAD Test Score</label>
         <input type="number" id="cadScore" placeholder="Enter CAD test score">
 
         <button onclick="calculatePostProbability()">Calculate Post-Test Probability</button>
-        <span id="postResult"></span>
+        <div id="postResult" class="result"><span id="postResultValue" class="bold-text"></span></div>
 
-        <div id="guidance"></div>
+        <div id="guidance" class="guidance"><span id="guidanceValue"></span></div>
     </div>
 
     <script>
@@ -110,7 +145,7 @@
 
             const preProbability = preTestProbabilityTable[gender][age][symptoms];
 
-            document.getElementById('result').innerHTML = `Pre-Test Probability: ${preProbability}%`;
+            document.getElementById('resultValue').innerHTML = `Pre-Test Probability: <span class="bold-text">${preProbability}%</span>`;
         }
 
         const likelihoodRatios = {
@@ -160,7 +195,7 @@
             const postOdds = preOdds * lr;
             const postProbability = postOdds / (1 + postOdds) * 100;
 
-            document.getElementById('postResult').innerHTML = `Post-Test Probability: ${postProbability.toFixed(2)}%`;
+            document.getElementById('postResultValue').innerHTML = `Post-Test Probability: <span class="bold-text">${postProbability.toFixed(2)}%</span>`;
 
             provideGuidance(postProbability);
         }
@@ -176,9 +211,8 @@
                 guidanceText = "Intermediate probability of CAD. Additional non-invasive testing such as stress echocardiography, stress SPECT, stress PET, stress CMR, or CCTA is recommended.";
             }
 
-            document.getElementById('guidance').innerHTML = `Guidance: ${guidanceText}`;
+            document.getElementById('guidanceValue').innerHTML = `Guidance: <span class="bold-text">${guidanceText}</span>`;
         }
     </script>
 </body>
 </html>
-
