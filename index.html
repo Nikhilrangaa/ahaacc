@@ -148,19 +148,6 @@
             document.getElementById('resultValue').innerHTML = `Pre-Test Probability: <span class="bold-text">${preProbability}%</span>`;
         }
 
-        const likelihoodRatios = {
-            'negative': [
-                {range: [-Infinity, -0.12], lr: 0.129},
-                {range: [-0.11, -0.07], lr: 0.220},
-                {range: [-0.06, 0], lr: 0.340}
-            ],
-            'positive': [
-                {range: [0.00, 0.10], lr: 1.446},
-                {range: [0.11, 0.20], lr: 1.913},
-                {range: [0.21, Infinity], lr: 2.888}
-            ]
-        };
-
         function calculatePostProbability() {
             let preProbability = parseFloat(document.getElementById('customPreProbability').value);
             if (isNaN(preProbability)) {
@@ -176,19 +163,9 @@
 
             let lr;
             if (cadScore < 0) {
-                for (let i = 0; i < likelihoodRatios['negative'].length; i++) {
-                    if (cadScore >= likelihoodRatios['negative'][i].range[0] && cadScore <= likelihoodRatios['negative'][i].range[1]) {
-                        lr = likelihoodRatios['negative'][i].lr;
-                        break;
-                    }
-                }
+                lr = 0.24;
             } else {
-                for (let i = 0; i < likelihoodRatios['positive'].length; i++) {
-                    if (cadScore >= likelihoodRatios['positive'][i].range[0] && cadScore <= likelihoodRatios['positive'][i].range[1]) {
-                        lr = likelihoodRatios['positive'][i].lr;
-                        break;
-                    }
-                }
+                lr = 1.80;
             }
 
             const preOdds = preProbability / (100 - preProbability);
