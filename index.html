@@ -20,12 +20,10 @@
             font-size: 24px;
             font-weight: bold;
         }
-        .subheading {
+        .subtitle {
             color: white;
             font-size: 16px;
             margin-top: 5px;
-            text-align: center;
-            font-weight: normal;
         }
         .container {
             max-width: 800px;
@@ -78,12 +76,25 @@
         .bold-text {
             font-weight: bold;
         }
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .checkbox-container input {
+            margin-right: 10px;
+        }
+        .checkbox-container label {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         Converting Corvista Score to Post-Test Probability Calculator
-        <div class="subheading">Based on AHA/ACC Guidelines</div>
+        <div class="subtitle">Risk factor weighted clinical likelihood model</div>
     </div>
     <div class="container">
         <h2>Step 1: Pre-Test Probability</h2>
@@ -93,8 +104,7 @@
             <option value="40-49">40-49</option>
             <option value="50-59">50-59</option>
             <option value="60-69">60-69</option>
-            <option value="70-79">70-79</option>
-            <option value=">80">>80</option>
+            <option value="70-80">70-80</option>
         </select>
 
         <label for="gender">Birth Gender</label>
@@ -105,9 +115,34 @@
 
         <label for="symptoms">Symptoms</label>
         <select id="symptoms">
-            <option value="Chest Pain">Chest Pain</option>
-            <option value="Dyspnea">Dyspnea</option>
+            <option value="Non-anginal pain">Non-anginal pain</option>
+            <option value="Atypical angina or dyspnea">Atypical angina or dyspnea</option>
+            <option value="Typical angina">Typical angina</option>
         </select>
+
+        <label for="riskFactors">Risk Factors</label>
+        <div id="riskFactors">
+            <div class="checkbox-container">
+                <input type="checkbox" id="familyHistory" name="riskFactors" value="familyHistory">
+                <label for="familyHistory">Family history</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="smoking" name="riskFactors" value="smoking">
+                <label for="smoking">Smoking</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="hyperlipidemia" name="riskFactors" value="hyperlipidemia">
+                <label for="hyperlipidemia">Hyperlipidemia</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="hypertension" name="riskFactors" value="hypertension">
+                <label for="hypertension">Hypertension</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="diabetes" name="riskFactors" value="diabetes">
+                <label for="diabetes">Diabetes</label>
+            </div>
+        </div>
 
         <button onclick="calculatePreProbability()">Calculate Pre-Test Probability</button>
         <div id="result" class="result"><span id="resultValue" class="bold-text"></span></div>
@@ -128,21 +163,19 @@
 
     <script>
         const preTestProbabilityTable = {
-            'male': {
-                '30-39': {'Chest Pain': 4, 'Dyspnea': 0},
-                '40-49': {'Chest Pain': 22, 'Dyspnea': 12},
-                '50-59': {'Chest Pain': 32, 'Dyspnea': 20},
-                '60-69': {'Chest Pain': 44, 'Dyspnea': 27},
-                '70-79': {'Chest Pain': 52, 'Dyspnea': 32},
-                '>80': {'Chest Pain': 52, 'Dyspnea': 32}
-            },
             'female': {
-                '30-39': {'Chest Pain': 5, 'Dyspnea': 3},
-                '40-49': {'Chest Pain': 10, 'Dyspnea': 3},
-                '50-59': {'Chest Pain': 13, 'Dyspnea': 9},
-                '60-69': {'Chest Pain': 16, 'Dyspnea': 14},
-                '70-79': {'Chest Pain': 27, 'Dyspnea': 12},
-                '>80': {'Chest Pain': 27, 'Dyspnea': 12}
+                '30-39': {'Non-anginal pain': [0, 1, 2], 'Atypical angina or dyspnea': [0, 1, 3], 'Typical angina': [2, 5, 10]},
+                '40-49': {'Non-anginal pain': [1, 1, 3], 'Atypical angina or dyspnea': [1, 2, 5], 'Typical angina': [4, 7, 12]},
+                '50-59': {'Non-anginal pain': [1, 2, 5], 'Atypical angina or dyspnea': [2, 3, 7], 'Typical angina': [6, 10, 15]},
+                '60-69': {'Non-anginal pain': [2, 4, 7], 'Atypical angina or dyspnea': [3, 6, 11], 'Typical angina': [10, 14, 19]},
+                '70-80': {'Non-anginal pain': [4, 7, 11], 'Atypical angina or dyspnea': [6, 10, 16], 'Typical angina': [16, 19, 23]}
+            },
+            'male': {
+                '30-39': {'Non-anginal pain': [1, 2, 5], 'Atypical angina or dyspnea': [2, 4, 8], 'Typical angina': [9, 14, 22]},
+                '40-49': {'Non-anginal pain': [2, 4, 8], 'Atypical angina or dyspnea': [3, 6, 12], 'Typical angina': [14, 20, 27]},
+                '50-59': {'Non-anginal pain': [4, 7, 12], 'Atypical angina or dyspnea': [6, 11, 17], 'Typical angina': [21, 27, 33]},
+                '60-69': {'Non-anginal pain': [8, 12, 17], 'Atypical angina or dyspnea': [12, 17, 25], 'Typical angina': [32, 35, 39]},
+                '70-80': {'Non-anginal pain': [15, 19, 24], 'Atypical angina or dyspnea': [22, 27, 34], 'Typical angina': [44, 44, 45]}
             }
         };
 
@@ -151,7 +184,27 @@
             const gender = document.getElementById('gender').value;
             const symptoms = document.getElementById('symptoms').value;
 
-            const preProbability = preTestProbabilityTable[gender][age][symptoms];
+            let riskFactorCount = 0;
+            const riskFactors = document.getElementsByName('riskFactors');
+            for (let i = 0; i < riskFactors.length; i++) {
+                if (riskFactors[i].checked) {
+                    riskFactorCount++;
+                }
+            }
+
+            let riskFactorIndex;
+            if (riskFactorCount === 0 || riskFactorCount === 1) {
+                riskFactorIndex = 0;
+            } else if (riskFactorCount >= 2 && riskFactorCount <= 3) {
+                riskFactorIndex = 1;
+            } else if (riskFactorCount >= 4 && riskFactorCount <= 5) {
+                riskFactorIndex = 2;
+            } else {
+                riskFactorIndex = 3;
+            }
+
+            const preProbabilityArray = preTestProbabilityTable[gender][age][symptoms];
+            const preProbability = preProbabilityArray[riskFactorIndex];
 
             document.getElementById('resultValue').innerHTML = `Pre-Test Probability: <span class="bold-text">${preProbability}%</span>`;
         }
@@ -170,10 +223,18 @@
             }
 
             let lr;
-            if (cadScore < 0) {
-                lr = 0.24;
-            } else {
-                lr = 1.80;
+            if (cadScore <= -0.12) {
+                lr = 0.129;
+            } else if (cadScore >= -0.11 && cadScore <= -0.07) {
+                lr = 0.220;
+            } else if (cadScore >= -0.06 && cadScore < 0.00) {
+                lr = 0.340;
+            } else if (cadScore >= 0.00 && cadScore <= 0.10) {
+                lr = 1.446;
+            } else if (cadScore >= 0.11 && cadScore <= 0.20) {
+                lr = 1.91;
+            } else if (cadScore >= 0.21) {
+                lr = 2.89;
             }
 
             const preOdds = preProbability / (100 - preProbability);
