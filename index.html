@@ -3,90 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Query Interface</title>
+    <title>Workspace Chatbot</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f5f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            background-color: #fff;
+            width: 400px;
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .chat-window {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
             background-color: #f9f9f9;
         }
-        label, input, textarea {
-            display: block;
-            margin-bottom: 10px;
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
         }
-        textarea {
-            width: 100%;
-            height: 100px;
+        .chat-message .sender {
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-        button {
-            padding: 10px 15px;
+        .chat-message .message {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 20px;
+            max-width: 75%;
+            align-self: flex-start;
+            word-wrap: break-word;
+        }
+        .chat-message.bot .message {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-end;
+        }
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background-color: #fff;
+            display: flex;
+        }
+        .chat-input-container input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chat-input-container button {
             background-color: #007bff;
             color: #fff;
             border: none;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-left: 10px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-        button:hover {
+        .chat-input-container button:hover {
             background-color: #0056b3;
-        }
-        #response {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #e9e9e9;
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Ask About Corvista</h1>
-    <form id="apiForm">
-        <label for="userInput">Enter your query:</label>
-        <input type="text" id="userInput" name="user_input" placeholder="e.g., What is Corvista, who is the CEO?" required>
-        <button type="submit">Submit</button>
-    </form>
-    <div id="response"></div>
+    <div class="chat-container">
+        <div class="chat-header">
+            Workspace Chatbot
+        </div>
+        <div id="chatWindow" class="chat-window">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="userInput" placeholder="Type your message here..." />
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
 
     <script>
-        document.getElementById('apiForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            // Get the user input from the form
-            const userInput = document.getElementById('userInput').value;
-
-            // Prepare the data to send
-            const data = {
-                user_input: userInput
-            };
-
-            // Make the API request
-            try {
-                const response = await fetch('https://c9guv12o60.execute-api.us-east-1.amazonaws.com/test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-
-                // Get the JSON from the response
-                const jsonResponse = await response.json();
-
-                // Display the response
-                document.getElementById('response').innerHTML = `<strong>Response:</strong> ${jsonResponse.response}`;
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error);
-                document.getElementById('response').innerHTML = `<strong>Error:</strong> ${error.message}`;
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
+
+        function sendMessage() {
+            const userInput = document.getElementById('userInput').value.trim();
+            if (userInput === '') return;
+
+            // Display user's message
+            appendMessage('You', userInput);
+
+            // Clear the input
+            document.getElementById('userInput').value = '';
+
+            // Send the message to the API
+            fetch('https://c9guv12o60.execute-api.us-east-1.amazonaws.com/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_input: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display bot's response
+                appendMessage('Bot', data.response);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                appendMessage('Bot', 'Sorry, something went wrong. Please try again.');
+            });
+        }
+
+        function appendMessage(sender, message) {
+            const chatWindow = document.getElementById('chatWindow');
+
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('chat-message');
+            if (sender === 'Bot') messageContainer.classList.add('bot');
+
+            const senderElem = document.createElement('div');
+            senderElem.classList.add('sender');
+            senderElem.textContent = sender;
+
+            const messageElem = document.createElement('div');
+            messageElem.classList.add('message');
+            messageElem.textContent = message;
+
+            messageContainer.appendChild(senderElem);
+            messageContainer.appendChild(messageElem);
+
+            chatWindow.appendChild(messageContainer);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
     </script>
 </body>
 </html>
+
